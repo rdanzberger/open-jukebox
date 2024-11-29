@@ -1,0 +1,161 @@
+openapi: 3.0.3
+info:
+  title:
+  description: Middleware that supports the Open Jukebox project
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8080/jukebox/api/v1'
+    description: Local server
+paths:
+  /search:
+    get:
+      tags:
+        - Search
+      operationId: search
+      summary: Search for Item
+      description: Get Spotify catalog information about albums, artists, playlists, tracks, shows, episodes or audiobooks that match a keyword string.
+      parameters:
+        - $ref: '#/components/parameters/QuerySearchQ'
+        - $ref: '#/components/parameters/QuerySearchType'
+        - $ref: '#/components/parameters/QuerySearchMarket'
+        - $ref: '#/components/parameters/QuerySearchLimit'
+        - $ref: '#/components/parameters/QuerySearchOffset'
+        - $ref: '#/components/parameters/QuerySearchIncludeExternal'
+      responses:
+        '200':
+          $ref: './spotify-oas.yaml#/components/responses/SearchItems'
+        '401':
+          $ref: './spotify-oas.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './spotify-oas.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: './spotify-oas.yaml#/components/responses/TooManyRequests'
+      security:
+        - oauth_2_0: []
+  /session:
+    get:
+      tags:
+        - Session
+      operationId: session
+      summary: Get Session
+      description: Get the current session information.
+      responses:
+        '200':
+          $ref: './spotify-oas.yaml#/components/responses/Session'
+        '401':
+          $ref: './spotify-oas.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './spotify-oas.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: './spotify-oas.yaml#/components/responses/TooManyRequests'
+      security:
+        - oauth_2_0: []
+    post:
+        tags:
+            - Session
+        operationId: session
+        summary: Create Session
+        description: Create a new session.
+        requestBody:
+            required: true
+            content:
+            application/json:
+                schema:
+                $ref: './spotify-oas.yaml#/components/schemas/CreateSession'
+        responses:
+            '201':
+            $ref: './spotify-oas.yaml#/components/responses/Session'
+            '400':
+            $ref: './spotify-oas.yaml#/components/responses/BadRequest'
+            '401':
+            $ref: './spotify-oas.yaml#/components/responses/Unauthorized'
+            '403':
+            $ref: './spotify-oas.yaml#/components/responses/Forbidden'
+            '429':
+            $ref: './spotify-oas.yaml#/components/responses/TooManyRequests'
+        security:
+            - oauth_2_0: []
+  /request:
+    post:
+      tags:
+        - Request
+      operationId: request
+      summary: Request Item
+      description: Request a Spotify catalog item to be played.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './spotify-oas.yaml#/components/schemas/RequestItem'
+      responses:
+        '201':
+          $ref: './spotify-oas.yaml#/components/responses/RequestItem'
+        '400':
+          $ref: './spotify-oas.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: './spotify-oas.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: './spotify-oas.yaml#/components/responses/Forbidden'
+        '429':
+          $ref: './spotify-oas.yaml#/components/responses/TooManyRequests'
+      security:
+        - oauth_2_0: []
+
+components:
+  parameters:
+    QuerySearchQ:
+      name: q
+      in: query
+      required: true
+      schema:
+        type: string
+      description: Your search query.
+    QuerySearchType:
+      name: type
+      in: query
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+      description: The type of item to search for.
+    QuerySearchMarket:
+      $ref: './spotify-oas.yaml#/components/parameters/QueryMarket'
+    QuerySearchLimit:
+      name: limit
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 50
+        default: 20
+      description: The number of items to return.
+    QuerySearchOffset:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 1000
+        default: 0
+      description: The index of the first item to return.
+    QuerySearchIncludeExternal:
+      name: include_external
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - audio
+      description: Whether to include external content.
+    Authorization:
+      name: Authorization
+      in: header
+      required: true
+      schema:
+          type: string
+      description: The access token for the Spotify API.
+      example: Bearer {access_token}f

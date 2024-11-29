@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: open-jukebox
+
+spotify-rest-client:
+  clientId: CHANGE_ME
+  clientSecret: CHANGE_ME
+  access-token-url: https://accounts.spotify.com/api/token
+  base-url: https://api.spotify.com/v1
